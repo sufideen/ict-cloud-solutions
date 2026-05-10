@@ -1,0 +1,63 @@
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --az:       #0078D4;
+  --az-dark:  #005A9E;
+  --az-light: #50ABF1;
+  --az-dim:   #003F72;
+  --cf:       #F6821F;
+  --em:       #00BCF2;
+  --s:        #070D17;
+  --s2:       #0B1220;
+  --s3:       #101828;
+  --tx:       #DCE8F8;
+  --mu:       #5A7A9E;
+  --br:       rgba(0,120,212,0.22);
+  --grid:     rgba(0,120,212,0.07);
+  --success:  #16A34A;
+  --warn:     #EAB308;
+  --danger:   #DC2626;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--s);
+  color: var(--tx);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--br); border-radius: 3px; }
+
+/* Pulse animation */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.pulse { animation: pulse-dot 2s infinite; }
+
+/* Typing indicator */
+@keyframes typing-bounce {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40%           { opacity: 1; transform: scale(1); }
+}
+.typing-dot { animation: typing-bounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Hero grid background */
+.hero-grid {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
