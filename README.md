@@ -81,6 +81,34 @@ supabase/
 
 ---
 
+## Schema implementation notes (2026)
+
+### 1. The 1536 dimension threshold
+The schema uses `vector(1536)` to align with standard OpenAI and open-source embedding defaults (`text-embedding-3-small`, `text-embedding-ada-002`). This ensures the HNSW index builds reliably — the index has a hard 2000-dimension ceiling, so larger values such as 3072 would fail silently at index creation time.
+
+### 2. RLS chaining
+The document chunk policy is chained through the `documents` table:
+```sql
+using (document_id in (select id from documents where user_id = auth.uid()))
+```
+This means even bulk uploads of thousands of chunks are locked to the authenticated owner. The `match_documents` RPC inherits this restriction automatically — no extra server-side filtering needed.
+
+### 3. Memory considerations
+Indexing 1536-dimensional vectors is RAM-intensive. On an 8 GiB machine, monitor swap after running the migration or ingesting large document sets:
+```bash
+free -h
+```
+If swap pressure is high, ingest documents in smaller batches or increase Supabase compute tier.
+
+### 4. Testing document upload and retrieval
+After running the migration, verify end-to-end RAG by:
+1. Uploading a document via the RAG panel in the dashboard
+2. Checking the `documents` and `document_chunks` tables in Supabase Table Editor
+3. Running a semantic search query in the chat panel with RAG toggled on
+4. Confirming the `match_documents` RPC returns rows with `similarity > 0.75`
+
+---
+
 ## Connecting real Azure OpenAI
 
 In `src/hooks/useChat.js`, replace the demo response logic with:
