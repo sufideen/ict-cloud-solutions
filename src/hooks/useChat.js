@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
-import { supabase, saveChatMessage } from '@/lib/supabase'
+import { saveChatMessage, invokeFunction } from '@/lib/supabase'
 
 export function useChat({ ragEnabled, sessionId }) {
   const [messages, setMessages] = useState([
@@ -11,9 +11,9 @@ export function useChat({ ragEnabled, sessionId }) {
       time: new Date(),
     }
   ])
-  const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef(null)
-  const historyRef = useRef([])
+  const [isTyping, setIsTyping]   = useState(false)
+  const [error, setError]         = useState(null)
+  const messagesEndRef            = useRef(null)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -21,6 +21,7 @@ export function useChat({ ragEnabled, sessionId }) {
 
   const sendMessage = useCallback(async (text) => {
     if (!text.trim() || isTyping) return
+    setError(null)
 
     const userMsg = { id: Date.now(), role: 'user', text, time: new Date() }
     setMessages(prev => [...prev, userMsg])
@@ -28,46 +29,35 @@ export function useChat({ ragEnabled, sessionId }) {
 
     if (sessionId) saveChatMessage(sessionId, 'user', text).catch(() => {})
 
-    const history = historyRef.current.slice(-10).map(m => ({
-      role: m.role === 'bot' ? 'assistant' : 'user',
-      content: m.text,
-    }))
-
     try {
-      const { data, error } = await supabase.functions.invoke('chat-ai', {
-        body: { message: text, sessionId, ragEnabled, history },
+      const { data, error: fnError } = await invokeFunction('chat', {
+        messages: [...messages, userMsg].filter(m => m.id !== 'welcome'),
+        ragEnabled,
+        sessionId,
       })
 
-      if (error) throw error
+      if (fnError) throw fnError
       if (data?.error) throw new Error(data.error)
 
       const botMsg = {
-        id: Date.now() + 1,
-        role: 'bot',
-        text: data.reply,
-        sources: data.sources ?? [],
-        time: new Date(),
-        model: data.model ?? 'Azure OpenAI GPT-4o',
-        ragUsed: data.ragUsed,
+        id:       Date.now() + 1,
+        role:     'bot',
+        text:     data.reply,
+        sources:  data.sources ?? [],
+        time:     new Date(),
+        model:    'Azure OpenAI GPT-4o',
+        ragUsed:  ragEnabled,
       }
       setMessages(prev => [...prev, botMsg])
-      historyRef.current = [...historyRef.current, userMsg, botMsg]
-
       if (sessionId) saveChatMessage(sessionId, 'assistant', data.reply).catch(() => {})
     } catch (err) {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          role: 'error',
-          text: err?.message ?? 'Failed to get a response. Please try again.',
-          time: new Date(),
-        },
-      ])
+      setError(err.message ?? 'Failed to get a response. Please try again.')
+      // Remove the user message on failure so they can retry
+      setMessages(prev => prev.filter(m => m.id !== userMsg.id))
     } finally {
       setIsTyping(false)
     }
-  }, [isTyping, ragEnabled, sessionId])
+  }, [isTyping, ragEnabled, sessionId, messages])
 
-  return { messages, isTyping, sendMessage, messagesEndRef, scrollToBottom }
+  return { messages, isTyping, error, sendMessage, messagesEndRef, scrollToBottom }
 }

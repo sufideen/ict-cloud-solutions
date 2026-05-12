@@ -30,12 +30,22 @@ export async function getSession() {
   return session
 }
 
+// ── Edge Function helpers ─────────────────────────────────────
+
+export async function invokeFunction(name, body) {
+  const { data, error } = await supabase.functions.invoke(name, { body })
+  return { data, error }
+}
+
+export async function getEmbedding(text) {
+  const { data, error } = await invokeFunction('embed', { text })
+  if (error) throw error
+  if (data?.error) throw new Error(data.error)
+  return data.embedding
+}
+
 // ── RAG / Documents ───────────────────────────────────────────
 
-/**
- * Fetch all documents for the current user's organisation.
- * Requires a `documents` table with RLS policies.
- */
 export async function fetchDocuments() {
   const { data, error } = await supabase
     .from('documents')
@@ -44,18 +54,20 @@ export async function fetchDocuments() {
   return { data, error }
 }
 
-/**
- * Semantic search via Supabase pgvector RPC.
- * Requires a `match_documents` RPC function in your Supabase project.
- * See: supabase/migrations/ for the SQL setup.
- */
 export async function semanticSearch(embedding, matchCount = 5) {
   const { data, error } = await supabase.rpc('match_documents', {
     query_embedding: embedding,
     match_threshold: 0.75,
-    match_count: matchCount
+    match_count: matchCount,
   })
   return { data, error }
+}
+
+export async function ingestDocument(name, content, userId) {
+  const { data, error } = await invokeFunction('ingest', { name, content, userId })
+  if (error) throw error
+  if (data?.error) throw new Error(data.error)
+  return data
 }
 
 // ── Support Tickets ───────────────────────────────────────────
