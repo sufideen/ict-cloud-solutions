@@ -12,11 +12,9 @@ serve(async (req) => {
   try {
     const { messages, ragEnabled, sessionId } = await req.json()
 
-    const azureEndpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT')!
-    const azureKey      = Deno.env.get('AZURE_OPENAI_KEY')!
-    const deployment    = Deno.env.get('AZURE_OPENAI_DEPLOYMENT') ?? 'gpt-4o'
-    const embDeployment = Deno.env.get('AZURE_OPENAI_EMBEDDING_DEPLOYMENT') ?? 'text-embedding-3-large'
-    const apiVersion    = '2024-02-01'
+    const openaiKey   = Deno.env.get('OPENAI_API_KEY')!
+    const chatModel   = Deno.env.get('OPENAI_CHAT_MODEL')   ?? 'gpt-4o'
+    const embedModel  = Deno.env.get('OPENAI_EMBED_MODEL')  ?? 'text-embedding-3-large'
 
     let context = ''
     let sources: { name: string; chunk: string; score: string }[] = []
@@ -25,14 +23,17 @@ serve(async (req) => {
       const lastUser = [...messages].reverse().find((m: { role: string }) => m.role === 'user')
       if (lastUser) {
         // Get embedding for the user's query
-        const embRes = await fetch(
-          `${azureEndpoint}/openai/deployments/${embDeployment}/embeddings?api-version=${apiVersion}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'api-key': azureKey },
-            body: JSON.stringify({ input: lastUser.text ?? lastUser.content }),
-          }
-        )
+        const embRes = await fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model: embedModel,
+            input: lastUser.text ?? lastUser.content,
+          }),
+        })
         const embData = await embRes.json()
         const embedding = embData.data?.[0]?.embedding
 
@@ -71,14 +72,19 @@ serve(async (req) => {
       })),
     ]
 
-    const chatRes = await fetch(
-      `${azureEndpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'api-key': azureKey },
-        body: JSON.stringify({ messages: chatPayload, max_tokens: 1200, temperature: 0.4 }),
-      }
-    )
+    const chatRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiKey}`,
+      },
+      body: JSON.stringify({
+        model:       chatModel,
+        messages:    chatPayload,
+        max_tokens:  1200,
+        temperature: 0.4,
+      }),
+    })
     const chatData = await chatRes.json()
     const reply = chatData.choices?.[0]?.message?.content ?? 'Sorry, I could not generate a response.'
 

@@ -12,18 +12,17 @@ serve(async (req) => {
     const { text } = await req.json()
     if (!text?.trim()) throw new Error('text is required')
 
-    const azureEndpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT')!
-    const azureKey      = Deno.env.get('AZURE_OPENAI_KEY')!
-    const deployment    = Deno.env.get('AZURE_OPENAI_EMBEDDING_DEPLOYMENT') ?? 'text-embedding-3-large'
+    const openaiKey  = Deno.env.get('OPENAI_API_KEY')!
+    const embedModel = Deno.env.get('OPENAI_EMBED_MODEL') ?? 'text-embedding-3-large'
 
-    const res = await fetch(
-      `${azureEndpoint}/openai/deployments/${deployment}/embeddings?api-version=2024-02-01`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'api-key': azureKey },
-        body: JSON.stringify({ input: text }),
-      }
-    )
+    const res = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiKey}`,
+      },
+      body: JSON.stringify({ model: embedModel, input: text }),
+    })
     const data = await res.json()
     const embedding = data.data?.[0]?.embedding
     if (!embedding) throw new Error(data.error?.message ?? 'No embedding returned')
