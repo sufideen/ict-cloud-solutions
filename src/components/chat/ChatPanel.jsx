@@ -15,7 +15,7 @@ export default function ChatPanel({ user }) {
   const [showSuggestions, setShowSuggestions] = useState(true)
   const sessionId = useRef(`session-${Date.now()}`)
 
-  const { messages, isTyping, sendMessage, messagesEndRef } = useChat({
+  const { messages, isTyping, error, sendMessage, messagesEndRef } = useChat({
     ragEnabled,
     sessionId: sessionId.current,
   })
@@ -119,6 +119,12 @@ export default function ChatPanel({ user }) {
                 <span key={i} className="typing-dot w-1.5 h-1.5 rounded-full bg-az-light" style={{ animationDelay: `${i * 0.2}s` }} />
               ))}
             </div>
+          </div>
+        )}
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}
+            className="mx-2 px-4 py-2.5 rounded-lg font-mono text-[11px] text-red-400 flex items-center gap-2">
+            <i className="ti ti-alert-circle" /> {error}
           </div>
         )}
         <div ref={messagesEndRef} />
