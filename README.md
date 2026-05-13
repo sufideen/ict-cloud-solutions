@@ -20,6 +20,8 @@
 
 ## Getting started
 
+> **New team member?** Read [CONTRIBUTING.md](./CONTRIBUTING.md) first — it walks you through cloning, creating your branch, running the build, and opening a pull request step by step.
+
 ### 1. Prerequisites
 - Node.js 18+
 - A Supabase project (free tier works for development)
