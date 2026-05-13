@@ -5,6 +5,8 @@ import ChatPanel      from '@/components/chat/ChatPanel'
 import RagPanel       from '@/components/rag/RagPanel'
 import TicketsPanel   from '@/components/tickets/TicketsPanel'
 import SettingsPanel  from '@/components/settings/SettingsPanel'
+import ReportsPanel   from '@/components/reports/ReportsPanel'
+import TeamPanel      from '@/components/team/TeamPanel'
 import { PulseDot }   from '@/components/ui'
 
 const PANEL_TITLES = {
@@ -27,12 +29,9 @@ export default function DashboardPage({ user, onLogout }) {
       case 'rag':      return <RagPanel />
       case 'tickets':  return <TicketsPanel />
       case 'settings': return <SettingsPanel />
-      default:
-        return (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="font-mono text-mu text-sm">Panel coming soon — {activePanel}</p>
-          </div>
-        )
+      case 'reports':  return <ReportsPanel />
+      case 'team':     return <TeamPanel />
+      default:         return null
     }
   }
 
@@ -52,14 +51,14 @@ export default function DashboardPage({ user, onLogout }) {
           className="flex items-center justify-between px-7 h-14 flex-shrink-0"
         >
           <span className="font-syne font-bold text-white text-base">
-            {PANEL_TITLES[activePanel] || activePanel}
+            {PANEL_TITLES[activePanel] ?? activePanel}
           </span>
 
           <div className="flex items-center gap-3">
             {[
-              { dot: '#4ADE80', label: 'Supabase · Connected', icon: null },
+              { dot: '#4ADE80', label: 'Supabase · Connected' },
               { dot: '#F6821F', label: 'Cloudflare · Active',  icon: 'ti-shield-check', iconColor: '#F6821F' },
-              { dot: '#50ABF1', label: 'Azure · Online',       icon: 'ti-cloud',       iconColor: '#50ABF1' },
+              { dot: '#50ABF1', label: 'OpenAI · Online',      icon: 'ti-sparkles',     iconColor: '#50ABF1' },
             ].map(b => (
               <span
                 key={b.label}

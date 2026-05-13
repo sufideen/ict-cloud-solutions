@@ -1,5 +1,7 @@
 import { SectionLabel } from '@/components/ui'
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'Not configured'
+
 function Row({ label, desc, value, valueColor }) {
   return (
     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }} className="flex items-center justify-between py-3">
@@ -28,10 +30,10 @@ export default function SettingsPanel() {
         <h3 className="font-syne font-semibold text-white text-[14px] pb-2.5 mb-3.5" style={{ borderBottom: '1px solid var(--br)' }}>
           Domain &amp; DNS
         </h3>
-        <Row label="Primary domain"      desc="Hosted at ict-cloud.solutions" value="ict-cloud.solutions" />
-        <Row label="DNS registrar"        desc="GoDaddy → nameservers pointing to Cloudflare" value="GoDaddy → Cloudflare" valueColor="#F6821F" />
-        <Row label="CDN / Edge"           desc="Cloudflare Zero Trust + WAF + DDoS" value="Cloudflare" valueColor="#F6821F" />
-        <Row label="SSL Certificate"      desc="Managed by Cloudflare, auto-renew enabled" value="Active · Valid" valueColor="#4ADE80" />
+        <Row label="Primary domain"  desc="Hosted at ict-cloud.solutions"                      value="ict-cloud.solutions" />
+        <Row label="DNS registrar"   desc="GoDaddy → nameservers pointing to Cloudflare"       value="GoDaddy → Cloudflare" valueColor="#F6821F" />
+        <Row label="CDN / Edge"      desc="Cloudflare Zero Trust + WAF + DDoS"                 value="Cloudflare"           valueColor="#F6821F" />
+        <Row label="SSL Certificate" desc="Managed by Cloudflare, auto-renew enabled"          value="Active · Valid"       valueColor="#4ADE80" />
       </section>
 
       {/* Supabase */}
@@ -44,16 +46,16 @@ export default function SettingsPanel() {
             <i className="ti ti-database" /> Supabase Project Config
           </h4>
           {[
-            ['Project URL',       'https://xxxx.supabase.co'],
-            ['Auth provider',     'Supabase Auth + Google OAuth'],
+            ['Project URL',       SUPABASE_URL],
+            ['Auth provider',     'Supabase Auth + Google OAuth + Azure AD'],
             ['Database',          'Postgres 15 + pgvector'],
             ['RLS Policies',      'Enforced', '#4ADE80'],
-            ['Vector dimensions', '3072 (text-embedding-3-large)'],
+            ['Vector dimensions', '1536 (text-embedding-3-large)'],
             ['Realtime',          'Enabled', '#4ADE80'],
           ].map(([k, v, c]) => (
             <div key={k} className="flex justify-between mb-2 font-mono text-[11px]">
               <span className="text-mu">{k}</span>
-              <span style={{ color: c || 'var(--tx)' }}>{v}</span>
+              <span style={{ color: c || 'var(--tx)' }} className="truncate max-w-[60%] text-right">{v}</span>
             </div>
           ))}
         </div>
@@ -64,10 +66,12 @@ export default function SettingsPanel() {
         <h3 className="font-syne font-semibold text-white text-[14px] pb-2.5 mb-3.5" style={{ borderBottom: '1px solid var(--br)' }}>
           AI Configuration
         </h3>
-        <Row label="LLM model"          desc="Primary chat model"                        value="Azure OpenAI GPT-4o" />
-        <Row label="Embedding model"    desc="Used for RAG document indexing"            value="text-embedding-3-large" />
-        <Row label="RAG chunk size"     desc="Tokens per document chunk"                 value="512 tokens" />
-        <Row label="Top-K retrieval"    desc="Documents retrieved per query"             value="5 chunks" />
+        <Row label="LLM model"       desc="Primary chat model via Edge Function"        value="OpenAI GPT-4o" />
+        <Row label="Embedding model" desc="Used for RAG document indexing and search"   value="text-embedding-3-large" />
+        <Row label="RAG chunk size"  desc="Characters per document chunk (with overlap)" value="1000 chars" />
+        <Row label="Chunk overlap"   desc="Overlap between adjacent chunks"             value="150 chars" />
+        <Row label="Top-K retrieval" desc="Max document chunks retrieved per query"     value="5 chunks" />
+        <Row label="Match threshold" desc="Min cosine similarity to include a result"   value="0.75" />
       </section>
 
       {/* DNS migration guide */}

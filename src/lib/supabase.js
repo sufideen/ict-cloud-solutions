@@ -20,6 +20,21 @@ export async function signInWithGoogle() {
   return { data, error }
 }
 
+export async function signInWithAzureAD() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: { redirectTo: `${window.location.origin}/dashboard` }
+  })
+  return { data, error }
+}
+
+export async function resetPassword(email) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  })
+  return { data, error }
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
   return { error }
@@ -103,5 +118,15 @@ export async function fetchChatHistory(sessionId) {
     .select('*')
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true })
+  return { data, error }
+}
+
+export async function fetchRecentUserMessages(limit = 5) {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('session_id, content, created_at')
+    .eq('role', 'user')
+    .order('created_at', { ascending: false })
+    .limit(limit)
   return { data, error }
 }

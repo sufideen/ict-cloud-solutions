@@ -38,7 +38,7 @@ const AZ_PILLS = [
   { dot: '#0078D4', name: 'Azure Landing Zones',     type: 'governance · policy' },
 ]
 
-export default function LandingPage({ onLogin }) {
+export default function LandingPage() {
   return (
     <div>
       <Navbar onLoginClick={() => document.getElementById('login')?.scrollIntoView({ behavior: 'smooth' })} />
@@ -98,7 +98,7 @@ export default function LandingPage({ onLogin }) {
         </div>
       </section>
 
-      <LoginForm onSuccess={onLogin} />
+      <LoginForm />
       <Footer />
     </div>
   )
