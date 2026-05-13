@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/lib/AuthContext'
-import { fetchDocuments, getEmbedding, semanticSearch, ingestDocument } from '@/lib/supabase'
+import { fetchDocuments, semanticSearch, ingestDocument } from '@/lib/supabase'
+import { getEmbeddingRouted } from '@/lib/chatAPI'
 
 const ACCEPTED_TYPES = ['.pdf', '.md', '.txt', '.docx']
 const MAX_BYTES      = 50 * 1024 * 1024 // 50 MB
@@ -41,7 +42,7 @@ export default function RagPanel() {
     setSearching(true)
     setSearchErr(null)
     try {
-      const embedding = await getEmbedding(query)
+      const embedding = await getEmbeddingRouted(query)
       const { data, error } = await semanticSearch(embedding, 5)
       if (error) throw error
       setResults(data ?? [])
