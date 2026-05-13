@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react'
-import { signInWithEmail, signInWithGoogle } from '@/lib/supabase'
+import { signInWithEmail, signInWithGoogle, signInWithAzureAD, resetPassword } from '@/lib/supabase'
 import { Button } from '@/components/ui'
 
-export default function LoginForm({ onSuccess }) {
+export default function LoginForm() {
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [mfa,      setMfa]      = useState(['', '', '', '', '', ''])
   const [error,    setError]    = useState('')
+  const [notice,   setNotice]   = useState('')
   const [loading,  setLoading]  = useState(false)
   const mfaRefs = useRef([])
 
@@ -23,28 +24,47 @@ export default function LoginForm({ onSuccess }) {
   const handleLogin = async (e) => {
     e?.preventDefault()
     setError('')
+    setNotice('')
+    if (!email.trim() || !password) {
+      setError('Please enter your email and password.')
+      return
+    }
     setLoading(true)
     try {
-      const { data, error: authError } = await signInWithEmail(email, password)
-      if (authError) {
-        // Demo mode — allow any credentials when Supabase isn't configured
-        if (authError.message?.includes('Invalid') || authError.message?.includes('fetch')) {
-          onSuccess(email || 'demo@ict-cloud.solutions')
-        } else {
-          setError(authError.message)
-        }
-      } else {
-        onSuccess(data.user?.email || email)
-      }
+      const { error: authError } = await signInWithEmail(email, password)
+      if (authError) setError(authError.message)
+      // On success AuthContext picks up the session change — no manual redirect needed
     } catch {
-      onSuccess(email || 'demo@ict-cloud.solutions')
+      setError('Unable to connect. Check your network and try again.')
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogle = async () => {
+    setError('')
+    setNotice('')
     await signInWithGoogle()
+  }
+
+  const handleAzureAD = async () => {
+    setError('')
+    setNotice('')
+    await signInWithAzureAD()
+  }
+
+  const handleResetPassword = async () => {
+    setError('')
+    setNotice('')
+    if (!email.trim()) {
+      setError('Enter your work email above, then click Forgot password.')
+      return
+    }
+    setLoading(true)
+    const { error: resetErr } = await resetPassword(email)
+    if (resetErr) setError(resetErr.message)
+    else setNotice(`Password reset email sent to ${email}. Check your inbox.`)
+    setLoading(false)
   }
 
   return (
@@ -101,6 +121,11 @@ export default function LoginForm({ onSuccess }) {
               <i className="ti ti-alert-circle" /> {error}
             </div>
           )}
+          {notice && (
+            <div style={{ background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.3)' }} className="flex items-center gap-2 mb-3 px-3 py-2 rounded-md text-[11px] font-mono text-green-300">
+              <i className="ti ti-circle-check" /> {notice}
+            </div>
+          )}
 
           <form onSubmit={handleLogin}>
             {/* Email */}
@@ -153,8 +178,8 @@ export default function LoginForm({ onSuccess }) {
             {/* SSO */}
             <div className="flex gap-2 mb-3.5">
               {[
-                { icon: 'ti-brand-google', label: 'Google SSO', action: handleGoogle },
-                { icon: 'ti-brand-windows', label: 'Azure AD SSO', action: handleGoogle },
+                { icon: 'ti-brand-google',  label: 'Google SSO',  action: handleGoogle },
+                { icon: 'ti-brand-windows', label: 'Azure AD SSO', action: handleAzureAD },
               ].map(btn => (
                 <button
                   key={btn.label}
@@ -185,9 +210,9 @@ export default function LoginForm({ onSuccess }) {
           </div>
 
           <p className="text-center text-[10px] font-mono text-mu mt-3">
-            <span className="text-az-light cursor-pointer hover:underline">Request access</span>
+            <a href="mailto:access@ict-cloud.solutions" className="text-az-light hover:underline cursor-pointer">Request access</a>
             {' · '}
-            <span className="text-az-light cursor-pointer hover:underline">Forgot password</span>
+            <span onClick={handleResetPassword} className="text-az-light cursor-pointer hover:underline">Forgot password</span>
           </p>
         </div>
       </div>
