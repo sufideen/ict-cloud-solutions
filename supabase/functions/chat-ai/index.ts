@@ -16,7 +16,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const { message, sessionId, ragEnabled, history = [] } = await req.json()
+    const { message, sessionId, ragEnabled, searchOnly = false, history = [] } = await req.json()
 
     const azureEndpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT')
     const azureKey      = Deno.env.get('AZURE_OPENAI_KEY')
@@ -66,6 +66,9 @@ serve(async (req) => {
         }
       }
     }
+
+    // ── Search-only mode (RAG panel semantic search) ──────────
+    if (searchOnly) return json({ sources })
 
     // ── Build prompt ──────────────────────────────────────────
     const systemContent = ragEnabled && ragContext

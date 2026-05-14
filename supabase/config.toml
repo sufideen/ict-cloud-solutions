@@ -32,3 +32,6 @@ enable_signup = true
 
 [functions.chat-ai]
 verify_jwt = true
+
+[functions.ingest-document]
+verify_jwt = true
