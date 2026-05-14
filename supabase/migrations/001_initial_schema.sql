@@ -87,7 +87,13 @@ alter table document_chunks enable row level security;
 alter table tickets         enable row level security;
 alter table chat_messages   enable row level security;
 
-create policy "Users see own documents" on documents for all using (auth.uid() = user_id);
-create policy "Users see own chunks" on document_chunks for all using (document_id in (select id from documents where user_id = auth.uid()));
-create policy "Users see own tickets" on tickets for all using (auth.uid() = user_id);
-create policy "Users see own chat messages" on chat_messages for all using (auth.uid() = user_id);
+-- Drop policies if they exist (makes migration idempotent)
+drop policy if exists "Users see own documents"     on documents;
+drop policy if exists "Users see own chunks"        on document_chunks;
+drop policy if exists "Users see own tickets"       on tickets;
+drop policy if exists "Users see own chat messages" on chat_messages;
+
+create policy "Users see own documents"     on documents      for all using (auth.uid() = user_id);
+create policy "Users see own chunks"        on document_chunks for all using (document_id in (select id from documents where user_id = auth.uid()));
+create policy "Users see own tickets"       on tickets        for all using (auth.uid() = user_id);
+create policy "Users see own chat messages" on chat_messages  for all using (auth.uid() = user_id);
