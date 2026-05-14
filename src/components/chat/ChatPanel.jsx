@@ -15,7 +15,7 @@ export default function ChatPanel({ user }) {
   const [showSuggestions, setShowSuggestions] = useState(true)
   const sessionId = useRef(`session-${Date.now()}`)
 
-  const { messages, isTyping, sendMessage, messagesEndRef } = useChat({
+  const { messages, isTyping, error, sendMessage, messagesEndRef } = useChat({
     ragEnabled,
     sessionId: sessionId.current,
   })
@@ -90,7 +90,7 @@ export default function ChatPanel({ user }) {
                 {/* RAG sources */}
                 {msg.sources?.length > 0 && (
                   <div style={{ background: 'rgba(0,120,212,0.06)', border: '1px solid rgba(0,120,212,0.15)' }} className="mt-2.5 p-2 rounded-md">
-                    <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">// SOURCES FROM KNOWLEDGE BASE</p>
+                    <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">{'// SOURCES FROM KNOWLEDGE BASE'}</p>
                     {msg.sources.map((s, i) => (
                       <div key={i} className="flex items-center gap-1.5 font-mono text-[10px] text-az-light mb-1">
                         <i className="ti ti-file-search text-[11px]" />
@@ -119,6 +119,12 @@ export default function ChatPanel({ user }) {
                 <span key={i} className="typing-dot w-1.5 h-1.5 rounded-full bg-az-light" style={{ animationDelay: `${i * 0.2}s` }} />
               ))}
             </div>
+          </div>
+        )}
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}
+            className="mx-2 px-4 py-2.5 rounded-lg font-mono text-[11px] text-red-400 flex items-center gap-2">
+            <i className="ti ti-alert-circle" /> {error}
           </div>
         )}
         <div ref={messagesEndRef} />

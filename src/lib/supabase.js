@@ -20,6 +20,21 @@ export async function signInWithGoogle() {
   return { data, error }
 }
 
+export async function signInWithAzureAD() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: { redirectTo: `${window.location.origin}/dashboard` }
+  })
+  return { data, error }
+}
+
+export async function resetPassword(email) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  })
+  return { data, error }
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
   return { error }
@@ -30,12 +45,22 @@ export async function getSession() {
   return session
 }
 
+// ── Edge Function helpers ─────────────────────────────────────
+
+export async function invokeFunction(name, body) {
+  const { data, error } = await supabase.functions.invoke(name, { body })
+  return { data, error }
+}
+
+export async function getEmbedding(text) {
+  const { data, error } = await invokeFunction('embed', { text })
+  if (error) throw error
+  if (data?.error) throw new Error(data.error)
+  return data.embedding
+}
+
 // ── RAG / Documents ───────────────────────────────────────────
 
-/**
- * Fetch all documents for the current user's organisation.
- * Requires a `documents` table with RLS policies.
- */
 export async function fetchDocuments() {
   const { data, error } = await supabase
     .from('documents')
@@ -44,18 +69,20 @@ export async function fetchDocuments() {
   return { data, error }
 }
 
-/**
- * Semantic search via Supabase pgvector RPC.
- * Requires a `match_documents` RPC function in your Supabase project.
- * See: supabase/migrations/ for the SQL setup.
- */
 export async function semanticSearch(embedding, matchCount = 5) {
   const { data, error } = await supabase.rpc('match_documents', {
     query_embedding: embedding,
     match_threshold: 0.75,
-    match_count: matchCount
+    match_count: matchCount,
   })
   return { data, error }
+}
+
+export async function ingestDocument(name, content, userId) {
+  const { data, error } = await invokeFunction('ingest', { name, content, userId })
+  if (error) throw error
+  if (data?.error) throw new Error(data.error)
+  return data
 }
 
 // ── Support Tickets ───────────────────────────────────────────
@@ -91,5 +118,15 @@ export async function fetchChatHistory(sessionId) {
     .select('*')
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true })
+  return { data, error }
+}
+
+export async function fetchRecentUserMessages(limit = 5) {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('session_id, content, created_at')
+    .eq('role', 'user')
+    .order('created_at', { ascending: false })
+    .limit(limit)
   return { data, error }
 }
