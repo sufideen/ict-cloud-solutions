@@ -15,7 +15,7 @@ export default function ChatPanel({ user }) {
   const [showSuggestions, setShowSuggestions] = useState(true)
   const sessionId = useRef(`session-${Date.now()}`)
 
-  const { messages, isTyping, sendMessage, messagesEndRef } = useChat({
+  const { messages, isTyping, error, clearError, sendMessage, messagesEndRef } = useChat({
     ragEnabled,
     sessionId: sessionId.current,
   })
@@ -123,6 +123,24 @@ export default function ChatPanel({ user }) {
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div
+          style={{ background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.3)' }}
+          className="mx-7 mb-3 px-4 py-2.5 rounded-lg flex items-center gap-2 font-mono text-[12px] text-red-400 flex-shrink-0"
+        >
+          <i className="ti ti-alert-circle text-sm flex-shrink-0" />
+          {error}
+          <button
+            onClick={clearError}
+            className="ml-auto text-red-400 hover:text-red-300 transition-colors bg-transparent border-0 cursor-pointer p-0"
+            aria-label="Dismiss"
+          >
+            <i className="ti ti-x text-xs" />
+          </button>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div style={{ borderTop: '1px solid var(--br)', background: 'var(--s2)' }} className="px-7 py-3 flex-shrink-0">
