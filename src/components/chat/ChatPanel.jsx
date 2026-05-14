@@ -66,47 +66,59 @@ export default function ChatPanel({ user }) {
       <div className="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-3.5">
         {messages.map(msg => (
           <div key={msg.id} className={`flex gap-2.5 max-w-[80%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : ''}`}>
-            <div
-              className={`w-7 h-7 rounded-md flex items-center justify-center text-xs flex-shrink-0 font-mono font-bold
-                ${msg.role === 'bot'
-                  ? 'bg-az text-white'
-                  : 'text-mu border border-[var(--br)]'
-                }`}
-              style={msg.role === 'user' ? { background: 'var(--s3)' } : {}}
-            >
-              {msg.role === 'bot' ? <i className="ti ti-robot text-xs" /> : initials}
-            </div>
-            <div>
+            {msg.role === 'error' ? (
               <div
-                className={`px-3.5 py-2.5 text-[13px] leading-relaxed
-                  ${msg.role === 'bot'
-                    ? 'rounded-[10px_10px_10px_2px] text-tx'
-                    : 'rounded-[10px_10px_2px_10px] text-white bg-az'
-                  }`}
-                style={msg.role === 'bot' ? { background: 'var(--s3)', border: '1px solid var(--br)' } : {}}
+                className="flex items-start gap-2 px-3.5 py-2.5 rounded-lg font-mono text-[12px]"
+                style={{ background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.3)', color: '#FCA5A5' }}
               >
-                <div className="font-mono text-[11px]">{formatText(msg.text)}</div>
-
-                {/* RAG sources */}
-                {msg.sources?.length > 0 && (
-                  <div style={{ background: 'rgba(0,120,212,0.06)', border: '1px solid rgba(0,120,212,0.15)' }} className="mt-2.5 p-2 rounded-md">
-                    <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">// SOURCES FROM KNOWLEDGE BASE</p>
-                    {msg.sources.map((s, i) => (
-                      <div key={i} className="flex items-center gap-1.5 font-mono text-[10px] text-az-light mb-1">
-                        <i className="ti ti-file-search text-[11px]" />
-                        {s.name} · {s.chunk}
-                        <span style={{ background: 'rgba(0,120,212,0.15)' }} className="ml-auto px-1.5 py-px rounded text-[9px]">{s.score}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <i className="ti ti-alert-circle text-[14px] flex-shrink-0 mt-px" style={{ color: '#F87171' }} />
+                <span>{msg.text}</span>
               </div>
-              <p className="font-mono text-[9px] text-mu mt-1">
-                {msg.time?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                {msg.model && ` · ${msg.model}`}
-                {msg.ragUsed && ' · RAG'}
-              </p>
-            </div>
+            ) : (
+              <>
+                <div
+                  className={`w-7 h-7 rounded-md flex items-center justify-center text-xs flex-shrink-0 font-mono font-bold
+                    ${msg.role === 'bot'
+                      ? 'bg-az text-white'
+                      : 'text-mu border border-[var(--br)]'
+                    }`}
+                  style={msg.role === 'user' ? { background: 'var(--s3)' } : {}}
+                >
+                  {msg.role === 'bot' ? <i className="ti ti-robot text-xs" /> : initials}
+                </div>
+                <div>
+                  <div
+                    className={`px-3.5 py-2.5 text-[13px] leading-relaxed
+                      ${msg.role === 'bot'
+                        ? 'rounded-[10px_10px_10px_2px] text-tx'
+                        : 'rounded-[10px_10px_2px_10px] text-white bg-az'
+                      }`}
+                    style={msg.role === 'bot' ? { background: 'var(--s3)', border: '1px solid var(--br)' } : {}}
+                  >
+                    <div className="font-mono text-[11px]">{formatText(msg.text)}</div>
+
+                    {/* RAG sources */}
+                    {msg.sources?.length > 0 && (
+                      <div style={{ background: 'rgba(0,120,212,0.06)', border: '1px solid rgba(0,120,212,0.15)' }} className="mt-2.5 p-2 rounded-md">
+                        <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">// SOURCES FROM KNOWLEDGE BASE</p>
+                        {msg.sources.map((s, i) => (
+                          <div key={i} className="flex items-center gap-1.5 font-mono text-[10px] text-az-light mb-1">
+                            <i className="ti ti-file-search text-[11px]" />
+                            {s.name} · {s.chunk}
+                            <span style={{ background: 'rgba(0,120,212,0.15)' }} className="ml-auto px-1.5 py-px rounded text-[9px]">{s.score}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <p className="font-mono text-[9px] text-mu mt-1">
+                    {msg.time?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {msg.model && ` · ${msg.model}`}
+                    {msg.ragUsed && ' · RAG'}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         ))}
 
