@@ -12,7 +12,7 @@ const services = [
 export default function Services() {
   return (
     <section id="services" className="px-12 py-20" style={{ background: 'var(--s)' }}>
-      <SectionLabel>// what we do</SectionLabel>
+      <SectionLabel>{'// what we do'}</SectionLabel>
       <h2 className="font-syne font-bold text-[34px] tracking-tight leading-tight mb-2.5">
         End-to-end Azure & AI support
       </h2>

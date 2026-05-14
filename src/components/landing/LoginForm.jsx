@@ -73,7 +73,7 @@ export default function LoginForm() {
 
         {/* Left — info */}
         <div>
-          <p className="font-mono text-[10px] tracking-[2px] text-az uppercase mb-2.5">// client portal</p>
+          <p className="font-mono text-[10px] tracking-[2px] text-az uppercase mb-2.5">{'// client portal'}</p>
           <h2 className="font-syne font-bold text-[28px] tracking-tight leading-tight mb-3">
             Secure access.<br />Verified clients only.
           </h2>
@@ -112,7 +112,7 @@ export default function LoginForm() {
             </div>
             <div>
               <p className="font-syne font-semibold text-[14px]">Client Portal — ict-cloud.solutions</p>
-              <p className="font-mono text-[11px] text-mu">// secure · invite-only · cloudflare + supabase</p>
+              <p className="font-mono text-[11px] text-mu">{'// secure · invite-only · cloudflare + supabase'}</p>
             </div>
           </div>
 

@@ -72,7 +72,7 @@ export default function TicketsPanel() {
     <div className="flex-1 overflow-y-auto p-7">
       <div className="flex items-end justify-between mb-5">
         <div>
-          <SectionLabel>// support</SectionLabel>
+          <SectionLabel>{'// support'}</SectionLabel>
           <h2 className="font-syne font-bold text-[22px] tracking-tight">Support Tickets</h2>
         </div>
         <div className="flex items-center gap-2">

@@ -88,7 +88,7 @@ export default function ReportsPanel() {
 
   return (
     <div className="flex-1 overflow-y-auto p-7">
-      <SectionLabel>// analytics</SectionLabel>
+      <SectionLabel>{'// analytics'}</SectionLabel>
       <h2 className="font-syne font-bold text-[22px] tracking-tight mb-6">Reports</h2>
 
       {/* Summary stats */}

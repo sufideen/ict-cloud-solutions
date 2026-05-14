@@ -22,7 +22,7 @@ function Row({ label, desc, value, valueColor }) {
 export default function SettingsPanel() {
   return (
     <div className="flex-1 overflow-y-auto p-7">
-      <SectionLabel>// configuration</SectionLabel>
+      <SectionLabel>{'// configuration'}</SectionLabel>
       <h2 className="font-syne font-bold text-[22px] tracking-tight mb-7">Portal Settings</h2>
 
       {/* Domain & DNS */}
@@ -80,7 +80,7 @@ export default function SettingsPanel() {
           DNS Migration Guide — GoDaddy → Cloudflare
         </h3>
         <div style={{ background: 'var(--s3)', border: '1px solid var(--br)' }} className="rounded-xl p-4 font-mono text-[12px] text-mu leading-loose">
-          <p className="text-az-light mb-2">// GoDaddy → Cloudflare nameserver migration</p>
+          <p className="text-az-light mb-2">{'// GoDaddy → Cloudflare nameserver migration'}</p>
           <p>1. Login to GoDaddy · go to <em className="text-tx">My Products → DNS</em></p>
           <p>2. Change nameservers to: <span className="text-[#F6821F]">kendra.ns.cloudflare.com / roy.ns.cloudflare.com</span></p>
           <p>3. In Cloudflare: Add site → ict-cloud.solutions → select plan</p>

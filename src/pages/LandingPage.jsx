@@ -48,7 +48,7 @@ export default function LandingPage() {
 
       {/* Hosting Stack */}
       <section id="infra" className="px-12 py-20" style={{ background: 'var(--s2)', borderTop: '1px solid var(--br)', borderBottom: '1px solid var(--br)' }}>
-        <SectionLabel>// infrastructure &amp; delivery stack</SectionLabel>
+        <SectionLabel>{'// infrastructure & delivery stack'}</SectionLabel>
         <h2 className="font-syne font-bold text-[34px] tracking-tight leading-tight mb-2.5">
           Built for resilience. Secured at the edge.
         </h2>
@@ -80,7 +80,7 @@ export default function LandingPage() {
 
       {/* Azure specialism */}
       <section id="azure" className="px-12 py-12" style={{ background: 'var(--s)' }}>
-        <SectionLabel>// azure services we specialise in</SectionLabel>
+        <SectionLabel>{'// azure services we specialise in'}</SectionLabel>
         <div className="grid grid-cols-4 gap-2.5 mt-5">
           {AZ_PILLS.map(p => (
             <div

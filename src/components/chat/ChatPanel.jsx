@@ -90,7 +90,7 @@ export default function ChatPanel({ user }) {
                 {/* RAG sources */}
                 {msg.sources?.length > 0 && (
                   <div style={{ background: 'rgba(0,120,212,0.06)', border: '1px solid rgba(0,120,212,0.15)' }} className="mt-2.5 p-2 rounded-md">
-                    <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">// SOURCES FROM KNOWLEDGE BASE</p>
+                    <p className="font-mono text-[9px] text-mu tracking-wide mb-1.5">{'// SOURCES FROM KNOWLEDGE BASE'}</p>
                     {msg.sources.map((s, i) => (
                       <div key={i} className="flex items-center gap-1.5 font-mono text-[10px] text-az-light mb-1">
                         <i className="ti ti-file-search text-[11px]" />

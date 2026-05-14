@@ -36,7 +36,7 @@ export default function TeamPanel() {
 
   return (
     <div className="flex-1 overflow-y-auto p-7">
-      <SectionLabel>// access control</SectionLabel>
+      <SectionLabel>{'// access control'}</SectionLabel>
       <h2 className="font-syne font-bold text-[22px] tracking-tight mb-6">Team Access</h2>
 
       <div className="grid grid-cols-2 gap-5">

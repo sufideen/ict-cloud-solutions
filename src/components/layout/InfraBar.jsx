@@ -13,7 +13,7 @@ export default function InfraBar() {
       style={{ background: 'var(--s2)', borderBottom: '1px solid var(--br)' }}
       className="flex items-center gap-5 px-12 py-2.5"
     >
-      <span className="font-mono text-[10px] tracking-widest text-mu">// hosted on</span>
+      <span className="font-mono text-[10px] tracking-widest text-mu">{'// hosted on'}</span>
 
       <div className="flex gap-3">
         {providers.map((p, i) => (
