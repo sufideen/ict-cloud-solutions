@@ -82,6 +82,7 @@ serve(async (req) => {
       headers: { ...CORS, 'Content-Type': 'application/json' },
     })
   } catch (err) {
+    console.error('ingest function error:', err)
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
     })

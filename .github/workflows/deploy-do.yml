@@ -1,0 +1,65 @@
+name: Deploy — DigitalOcean + Supabase
+
+# Triggers on push to main (same as the GCP workflow).
+# Deploys the static site to DigitalOcean App Platform and
+# deploys Supabase Edge Functions (chat, embed, ingest).
+#
+# Required GitHub Secrets:
+#   DIGITALOCEAN_ACCESS_TOKEN — DO personal access token (read/write)
+#   DO_APP_ID                 — App Platform app ID (from `doctl apps list`)
+#   VITE_SUPABASE_URL         — Supabase project URL
+#   VITE_SUPABASE_ANON_KEY    — Supabase anon key
+#   SUPABASE_ACCESS_TOKEN     — Supabase CLI access token
+#   SUPABASE_PROJECT_ID       — Supabase project ref (e.g. abcdefghijklmnop)
+#
+# Cloudflare DNS (one-time manual step — no secrets needed here):
+#   In Cloudflare dashboard add a CNAME:
+#     Name:    @  (or subdomain)
+#     Target:  <your-app-name>.ondigitalocean.app
+#     Proxy:   Proxied (orange cloud)
+#   SSL/TLS → Overview: set to "Full"
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-do:
+    name: Deploy to DigitalOcean App Platform
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── DigitalOcean App Platform ──────────────────────────────
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Update App Platform env vars and trigger deploy
+        run: |
+          # Push the app spec (picks up any spec changes) and force a new deploy.
+          # App-level secrets (VITE_SUPABASE_URL etc.) are managed in the DO dashboard
+          # and are NOT overwritten by this update.
+          doctl apps update ${{ secrets.DO_APP_ID }} --spec .do/app.yaml --wait
+          doctl apps create-deployment ${{ secrets.DO_APP_ID }} --wait
+
+      # ── Supabase Edge Functions ────────────────────────────────
+      - name: Set up Node (for Supabase CLI via npx)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy Supabase Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID:   ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          npx supabase functions deploy chat   --project-ref $SUPABASE_PROJECT_ID
+          npx supabase functions deploy embed  --project-ref $SUPABASE_PROJECT_ID
+          npx supabase functions deploy ingest --project-ref $SUPABASE_PROJECT_ID

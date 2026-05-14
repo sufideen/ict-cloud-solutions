@@ -8,6 +8,12 @@ const CORS = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
+  if (!req.headers.get('authorization')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
   try {
     const { text } = await req.json()
     if (!text?.trim()) throw new Error('text is required')
@@ -41,6 +47,7 @@ serve(async (req) => {
       headers: { ...CORS, 'Content-Type': 'application/json' },
     })
   } catch (err) {
+    console.error('embed function error:', err)
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
     })

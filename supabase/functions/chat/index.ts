@@ -53,6 +53,12 @@ function buildEmbedURL(): { url: string; headers: Record<string, string>; model?
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
+  if (!req.headers.get('authorization')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
   try {
     const { messages, ragEnabled, sessionId } = await req.json()
 
@@ -114,6 +120,7 @@ serve(async (req) => {
       headers: { ...CORS, 'Content-Type': 'application/json' },
     })
   } catch (err) {
+    console.error('chat function error:', err)
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
     })
