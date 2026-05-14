@@ -64,7 +64,12 @@ export default function ChatPanel({ user }) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-3.5">
-        {messages.map(msg => (
+        {messages.map(msg => msg.role === 'error' ? (
+          <div key={msg.id} style={{ background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)' }} className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-mono text-[12px] text-red-400">
+            <i className="ti ti-alert-circle text-sm flex-shrink-0" />
+            {msg.text}
+          </div>
+        ) : (
           <div key={msg.id} className={`flex gap-2.5 max-w-[80%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : ''}`}>
             <div
               className={`w-7 h-7 rounded-md flex items-center justify-center text-xs flex-shrink-0 font-mono font-bold
