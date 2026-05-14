@@ -1,0 +1,41 @@
+# DigitalOcean App Platform spec
+# Docs: https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+#
+# Setup:
+#   1. In the DO dashboard: Apps → Create App → GitHub → sufideen/ict-cloud-solutions (main)
+#   2. After creating the app, set these encrypted env vars in Settings → App-Level Env Vars:
+#        VITE_SUPABASE_URL     — your Supabase project URL
+#        VITE_SUPABASE_ANON_KEY — your Supabase anon key
+#   3. For Cloudflare: in your Cloudflare DNS add a CNAME for your domain → <app>.ondigitalocean.app
+#      Set the record to DNS-only (grey cloud) or Proxied (orange cloud) as preferred.
+#      SSL/TLS mode in Cloudflare: Full (not Full Strict) when using DO's managed cert.
+
+name: ict-cloud-portal
+region: lon  # London — closest to EU/UK
+
+static_sites:
+  - name: web
+    github:
+      repo: sufideen/ict-cloud-solutions
+      branch: main
+      deploy_on_push: false  # controlled by GitHub Actions workflow
+    build_command: npm run build
+    output_dir: dist
+    index_document: index.html
+    error_document: index.html   # SPA catch-all — serves index.html for all 404s
+    envs:
+      - key: VITE_SUPABASE_URL
+        scope: BUILD_TIME
+        type: SECRET             # set value in DO dashboard, never commit it
+      - key: VITE_SUPABASE_ANON_KEY
+        scope: BUILD_TIME
+        type: SECRET
+      - key: VITE_APP_ENV
+        scope: BUILD_TIME
+        value: "production"
+      - key: VITE_APP_DOMAIN
+        scope: BUILD_TIME
+        value: "ict-cloud.solutions"
+      - key: VITE_LOCAL_AI
+        scope: BUILD_TIME
+        value: "false"           # always use Supabase Edge Functions in production
